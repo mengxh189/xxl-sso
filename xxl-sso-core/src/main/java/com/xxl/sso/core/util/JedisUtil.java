@@ -26,9 +26,11 @@ public class JedisUtil {
      * redis address, like "{ip}"、"{ip}:{port}"、"{redis/rediss}://xxl-sso:{password}@{ip}:{port:6379}/{db}"；Multiple "," separated
      */
     private static String address;
+    private static String password;
 
-    public static void init(String address) {
+    public static void init(String address, String password) {
         JedisUtil.address = address;
+        JedisUtil.password = password;
 
         getInstance();
     }
@@ -82,6 +84,7 @@ public class JedisUtil {
                             String[] addressArr = address.split(",");
                             for (int i = 0; i < addressArr.length; i++) {
                                 JedisShardInfo jedisShardInfo = new JedisShardInfo(addressArr[i]);
+                                jedisShardInfo.setPassword(password);
                                 jedisShardInfos.add(jedisShardInfo);
                             }
                             shardedJedisPool = new ShardedJedisPool(config, jedisShardInfos);
@@ -380,8 +383,10 @@ public class JedisUtil {
 
     public static void main(String[] args) {
         String xxlSsoRedisAddress = "redis://xxl-sso:password@127.0.0.1:6379/0";
-        xxlSsoRedisAddress = "redis://127.0.0.1:6379/0";
-        init(xxlSsoRedisAddress);
+        xxlSsoRedisAddress = "redis://192.168.88.85:6379/6";
+//        xxlSsoRedisAddress = "redis://192.168.88.85:6379/6,192.168.88.85:6379/6,192.168.88.85:6379/6";
+        String password = "warwick";
+        init(xxlSsoRedisAddress, password);
 
         setObjectValue("key", "666", 2*60*60);
         System.out.println(getObjectValue("key"));
