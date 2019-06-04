@@ -1,5 +1,6 @@
 package com.xxl.sso.core.filter;
 
+import com.xxl.sso.core.cache.CacheManager;
 import com.xxl.sso.core.conf.Conf;
 import com.xxl.sso.core.entity.ReturnT;
 import com.xxl.sso.core.login.SsoTokenLoginHelper;
@@ -14,13 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * app sso filter
- *
- * @author xuxueli 2018-04-08 21:30:54
- */
+
 public class XxlSsoTokenFilter extends HttpServlet implements Filter {
-    private static Logger logger = LoggerFactory.getLogger(XxlSsoTokenFilter.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(XxlSsoTokenFilter.class);
 
     private static final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
@@ -35,7 +32,9 @@ public class XxlSsoTokenFilter extends HttpServlet implements Filter {
         logoutPath = filterConfig.getInitParameter(Conf.SSO_LOGOUT_PATH);
         excludedPaths = filterConfig.getInitParameter(Conf.SSO_EXCLUDED_PATHS);
 
-        logger.info("XxlSsoTokenFilter init.");
+        CacheManager.put(ssoServer);
+        LOGGER.info("XxlSsoTokenFilter ssoServer:{}", ssoServer);
+        LOGGER.info("XxlSsoTokenFilter init.");
     }
 
     @Override
@@ -68,6 +67,7 @@ public class XxlSsoTokenFilter extends HttpServlet implements Filter {
 
             // logout
             SsoTokenLoginHelper.logout(req);
+//            ssoRpcService.logout(req);
 
             // response
             res.setStatus(HttpServletResponse.SC_OK);
@@ -79,6 +79,8 @@ public class XxlSsoTokenFilter extends HttpServlet implements Filter {
 
         // login filter
         XxlSsoUser xxlUser = SsoTokenLoginHelper.loginCheck(req);
+//        XxlSsoUser xxlUser = ssoRpcService.loginCheck(req);
+
         if (xxlUser == null) {
 
             // response

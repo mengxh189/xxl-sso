@@ -1,5 +1,6 @@
 package com.xxl.sso.core.filter;
 
+import com.xxl.sso.core.cache.CacheManager;
 import com.xxl.sso.core.conf.Conf;
 import com.xxl.sso.core.login.SsoWebLoginHelper;
 import com.xxl.sso.core.path.impl.AntPathMatcher;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 /**
  * web sso filter
@@ -19,7 +21,7 @@ import java.io.IOException;
  * @author xuxueli 2018-04-03
  */
 public class XxlSsoWebFilter extends HttpServlet implements Filter {
-    private static Logger logger = LoggerFactory.getLogger(XxlSsoWebFilter.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(XxlSsoWebFilter.class);
 
     private static final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
@@ -34,7 +36,9 @@ public class XxlSsoWebFilter extends HttpServlet implements Filter {
         logoutPath = filterConfig.getInitParameter(Conf.SSO_LOGOUT_PATH);
         excludedPaths = filterConfig.getInitParameter(Conf.SSO_EXCLUDED_PATHS);
 
-        logger.info("XxlSsoWebFilter init.");
+        CacheManager.put(ssoServer);
+        LOGGER.info("XxlSsoWebFilter ssoServer:{}", ssoServer);
+        LOGGER.info("XxlSsoWebFilter init.");
     }
 
     @Override
@@ -46,8 +50,8 @@ public class XxlSsoWebFilter extends HttpServlet implements Filter {
         String servletPath = req.getServletPath();
 
         // excluded path check
-        if (excludedPaths!=null && excludedPaths.trim().length()>0) {
-            for (String excludedPath:excludedPaths.split(",")) {
+        if (excludedPaths != null && excludedPaths.trim().length() > 0) {
+            for (String excludedPath : excludedPaths.split(",")) {
                 String uriPattern = excludedPath.trim();
 
                 // 支持ANT表达式
@@ -61,15 +65,15 @@ public class XxlSsoWebFilter extends HttpServlet implements Filter {
         }
 
         // logout path check
-        if (logoutPath!=null
-                && logoutPath.trim().length()>0
-                && logoutPath.equals(servletPath)) {
+        if (logoutPath != null && logoutPath.trim().length() > 0 && logoutPath.equals(servletPath)) {
 
             // remove cookie
             SsoWebLoginHelper.removeSessionIdByCookie(req, res);
 
             // redirect logout
             String logoutPageUrl = ssoServer.concat(Conf.SSO_LOGOUT);
+            String link = req.getRequestURL().toString().split("/")[2];
+            logoutPageUrl = logoutPageUrl + "?" + Conf.REDIRECT_URL + "=" + URLEncoder.encode("http://" + link, "UTF-8");
             res.sendRedirect(logoutPageUrl);
 
             return;
@@ -82,12 +86,12 @@ public class XxlSsoWebFilter extends HttpServlet implements Filter {
         if (xxlUser == null) {
 
             String header = req.getHeader("content-type");
-            boolean isJson=  header!=null && header.contains("json");
+            boolean isJson = header != null && header.contains("json");
             if (isJson) {
 
                 // json msg
                 res.setContentType("application/json;charset=utf-8");
-                res.getWriter().println("{\"code\":"+Conf.SSO_LOGIN_FAIL_RESULT.getCode()+", \"msg\":\""+ Conf.SSO_LOGIN_FAIL_RESULT.getMsg() +"\"}");
+                res.getWriter().println("{\"code\":" + Conf.SSO_LOGIN_FAIL_RESULT.getCode() + ", \"msg\":\"" + Conf.SSO_LOGIN_FAIL_RESULT.getMsg() + "\"}");
                 return;
             } else {
 
@@ -95,18 +99,15 @@ public class XxlSsoWebFilter extends HttpServlet implements Filter {
                 String link = req.getRequestURL().toString();
 
                 // redirect logout
-                String loginPageUrl = ssoServer.concat(Conf.SSO_LOGIN)
-                        + "?" + Conf.REDIRECT_URL + "=" + link;
+                String loginPageUrl = ssoServer.concat(Conf.SSO_LOGIN) + "?" + Conf.REDIRECT_URL + "=" + URLEncoder.encode(link, "UTF-8");
 
                 res.sendRedirect(loginPageUrl);
                 return;
             }
-
         }
 
         // ser sso user
         request.setAttribute(Conf.SSO_USER, xxlUser);
-
 
         // already login, allow
         chain.doFilter(request, response);

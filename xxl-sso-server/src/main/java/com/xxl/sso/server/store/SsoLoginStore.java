@@ -1,8 +1,8 @@
-package com.xxl.sso.core.store;
+package com.xxl.sso.server.store;
 
 import com.xxl.sso.core.conf.Conf;
 import com.xxl.sso.core.user.XxlSsoUser;
-import com.xxl.sso.core.util.JedisUtil;
+import com.xxl.sso.server.utils.JedisUtil;
 
 /**
  * local login store

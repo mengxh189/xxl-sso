@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class IndexController {
 
-    @RequestMapping("/")
+    @RequestMapping("/app")
     @ResponseBody
     public ReturnT<XxlSsoUser> index(HttpServletRequest request) {
         XxlSsoUser xxlUser = (XxlSsoUser) request.getAttribute(Conf.SSO_USER);

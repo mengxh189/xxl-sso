@@ -1,4 +1,4 @@
-package com.xxl.sso.core.store;
+package com.xxl.sso.server.store;
 
 import com.xxl.sso.core.user.XxlSsoUser;
 

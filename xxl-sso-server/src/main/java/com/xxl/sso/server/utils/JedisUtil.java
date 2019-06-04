@@ -1,4 +1,4 @@
-package com.xxl.sso.core.util;
+package com.xxl.sso.server.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

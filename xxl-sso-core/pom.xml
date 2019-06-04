@@ -27,11 +27,10 @@
             <version>${slf4j-api.version}</version>
         </dependency>
 
-        <!-- jedis -->
         <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+            <version>4.0.60</version>
         </dependency>
 
     </dependencies>

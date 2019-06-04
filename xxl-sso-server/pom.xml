@@ -49,6 +49,18 @@
             <version>${parent.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+            <version>4.0.60</version>
+        </dependency>
+
         <!-- devtools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

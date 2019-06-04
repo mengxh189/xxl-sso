@@ -1,31 +1,32 @@
 package com.xxl.sso.server.controller;
 
-import com.xxl.sso.core.login.SsoTokenLoginHelper;
-import com.xxl.sso.core.store.SsoLoginStore;
 import com.xxl.sso.core.user.XxlSsoUser;
-import com.xxl.sso.core.store.SsoSessionIdHelper;
 import com.xxl.sso.server.core.model.UserInfo;
 import com.xxl.sso.server.core.result.ReturnT;
+import com.xxl.sso.server.login.SsoTokenLoginHelper;
 import com.xxl.sso.server.service.UserService;
+import com.xxl.sso.server.store.SsoLoginStore;
+import com.xxl.sso.server.store.SsoSessionIdHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import java.util.UUID;
 
-/**
- * sso server (for app)
- *
- * @author xuxueli 2018-04-08 21:02:54
- */
+
 @Controller
 @RequestMapping("/app")
 public class AppController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppController.class);
     @Autowired
     private UserService userService;
-
+    @Resource
+    private SsoTokenLoginHelper ssoTokenLoginHelper;
 
     /**
      * Login
@@ -57,7 +58,7 @@ public class AppController {
         String sessionId = SsoSessionIdHelper.makeSessionId(xxlUser);
 
         // 3、login, store storeKey
-        SsoTokenLoginHelper.login(sessionId, xxlUser);
+        ssoTokenLoginHelper.login(sessionId, xxlUser);
 
         // 4、return sessionId
         return new ReturnT<String>(sessionId);
@@ -74,7 +75,7 @@ public class AppController {
     @ResponseBody
     public ReturnT<String> logout(String sessionId) {
         // logout, remove storeKey
-        SsoTokenLoginHelper.logout(sessionId);
+        ssoTokenLoginHelper.logout(sessionId);
         return ReturnT.SUCCESS;
     }
 
@@ -89,7 +90,7 @@ public class AppController {
     public ReturnT<XxlSsoUser> logincheck(String sessionId) {
 
         // logout
-        XxlSsoUser xxlUser = SsoTokenLoginHelper.loginCheck(sessionId);
+        XxlSsoUser xxlUser = ssoTokenLoginHelper.loginCheck(sessionId);
         if (xxlUser == null) {
             return new ReturnT<XxlSsoUser>(ReturnT.FAIL_CODE, "sso not login.");
         }

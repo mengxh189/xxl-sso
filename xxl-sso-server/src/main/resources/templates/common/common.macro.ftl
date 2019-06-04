@@ -57,7 +57,7 @@
             <div class="navbar-custom-menu">
                 <ul class="nav navbar-nav">
                     <li class="dropdown user user-menu">
-                        <a href="${request.contextPath}/logout"   >
+                        <a href="${request.contextPath}/sso/logout"   >
                             <span class="hidden-xs">注销【${xxlUser.username}】</span>
                         </a>
                     </li>
